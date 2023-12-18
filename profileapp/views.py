@@ -19,7 +19,6 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from calendar import monthrange
 
-from profileapp.tasks import fetch_eeg_data
 # Create your views here.
 
 @login_required(login_url='login')
