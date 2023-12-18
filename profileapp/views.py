@@ -14,10 +14,11 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from datetime import timedelta
-from .models import Profile, Seizures
+from .models import Profile, Seizures, Alert
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from calendar import monthrange
+from urllib.parse import unquote
 
 # Create your views here.
 
@@ -32,13 +33,17 @@ def index(request):
     end_of_hour = now
     start_of_month = now - timedelta(days=30)
     end_of_month = now
+    start_of_day = now - timedelta(hours=24)
+    end_of_day = now
     weekly_incidents = Seizures.objects.filter(user=user,timestamp__range=[start_of_week, end_of_week]).count()
     hourly_incidents = Seizures.objects.filter(user=user,timestamp__range=[start_of_hour, end_of_hour]).count()
     monthly_incidents = Seizures.objects.filter(user=user,timestamp__range=[start_of_month, end_of_month]).count()
-    incidents = Seizures.objects.filter(user=user).count()
+    incidents = Seizures.objects.filter(user=user, timestamp__range=[start_of_day, end_of_day]).count()
     last_incident = Seizures.objects.filter(user=user).order_by('-timestamp').first()
     last_location = last_incident.location if last_incident else "N/A"
     last_incident_date = last_incident.timestamp if last_incident else "N/A"
+    last_seizures = Seizures.objects.filter(user=user).order_by('-timestamp')[:4]
+    last_alerts = Alert.objects.filter(user=user).order_by('-timestamp')[:4]
     context = {
         'weekly_incidents': weekly_incidents,
         'hourly_incidents': hourly_incidents,
@@ -46,6 +51,8 @@ def index(request):
         'incidents' : incidents,
         'last_location': last_location,
         'last_incident_date': last_incident_date,
+        'last_seizures' : last_seizures,
+        'last_alerts' : last_alerts
     }
     print(context)
     return render(request, 'profileapp/home.html',context)
@@ -55,13 +62,17 @@ def seizure_detected(request):
     if request.method=='POST' :
         data = json.loads(request.body.decode('utf-8'))
         token = data.get('pushbullet_token')
+        loc = data.get('location')
+        loc = unquote(str(loc))
         # print(token)
         user = Profile.objects.filter(push_bullet_token=token).first()
         if not user:
             return JsonResponse({'error': 'Invalid Pushbullet token'}, status=401)
-        seizure = Seizures(user=user.user,location=data.get('location'))
+        seizure = Seizures(user=user.user,location=str(loc))
         seizure.save()
-        return JsonResponse({'message': 'Seizure record created successfully'})
+        alert = Alert(user=user.user,token=token)
+        alert.save()
+        return JsonResponse({'message': 'Seizure and message record created successfully'})
     return JsonResponse({'message':'Not a post request'})
 
 @login_required(login_url='login')

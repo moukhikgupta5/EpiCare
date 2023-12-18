@@ -1,12 +1,12 @@
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyASFc4Awvg_1-GkUJMnXCnqhKeZUbuKWDQ",
-    authDomain: "carevive-90041.firebaseapp.com",
-    databaseURL: "https://carevive-90041-default-rtdb.firebaseio.com",
-    projectId: "carevive-90041",
-    storageBucket: "carevive-90041.appspot.com",
-    messagingSenderId: "921387804409",
-    appId: "1:921387804409:web:4036ec7397f4537ed9e428"
+    apiKey: "AIzaSyAckqRrDkeFhWCZ0kqS-_tE-8DzL0AHJ9E",
+    authDomain: "seizure-detection-1f412.firebaseapp.com",
+    databaseURL: "https://seizure-detection-1f412-default-rtdb.firebaseio.com",
+    projectId: "seizure-detection-1f412",
+    storageBucket: "seizure-detection-1f412.appspot.com",
+    messagingSenderId: "589441294118",
+    appId: "1:589441294118:web:e36c504db55586f8372be7"
   };
   
   // Initialize Firebase

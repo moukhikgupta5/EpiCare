@@ -25,3 +25,11 @@ class Seizures(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Seizure at {self.timestamp}"
+    
+class Alert(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    token = models.CharField(max_length=200)
+
+    def __str__(self) -> str:
+        return f"{self.user.username}'s message sent at {self.timestamp}"
